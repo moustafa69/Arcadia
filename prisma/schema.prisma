@@ -12,3 +12,191 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String         @id @default(uuid())
+  name      String
+  username  String         @unique
+  email     String         @unique
+  status    Status         @default(PENDING)
+  password  String
+  picture   String?
+  favorites FavoriteGame[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  deletedAt DateTime?
+
+  @@index([email])
+}
+
+model Admin {
+  id          String    @id @default(uuid())
+  name        String
+  username    String    @unique
+  email       String    @unique
+  password    String
+  role        String
+  permissions String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  createdGames  Game[]
+  createdGuides Guide[]
+
+  @@index([email])
+}
+
+model Game {
+  id              String         @id @default(uuid())
+  title           String         @unique
+  mechanic        String?
+  universalPrice  Float?
+  platform        String[]
+  store           String[]
+  playerBaseCount Int?
+  netCodeType     String?
+  coverPhoto      String?
+  timesFavorited  Int            @default(0)
+  categoryId      Int
+  adminId         String
+  updatedAt       DateTime       @updatedAt
+  createdAt       DateTime       @default(now())
+  deletedAt       DateTime?
+  characters      Character[]
+  guides          Guide[]
+  favoriteBy      FavoriteGame[]
+
+  // Relations
+  createdBy Admin    @relation(fields: [adminId], references: [id])
+  category  Category @relation(fields: [categoryId], references: [id])
+
+  @@index([title])
+  @@index([categoryId])
+  @@index([netCodeType])
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  totalGames  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  parentRels CategoryRelationship[] @relation("ParentCategories")
+  childRels  CategoryRelationship[] @relation("ChildCategories")
+
+  Game Game[]
+}
+
+model CategoryRelationship {
+  id               Int       @id @default(autoincrement())
+  parentCategoryId Int
+  childCategoryId  Int
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  // Relations
+  parentCategory Category @relation("ParentCategories", fields: [parentCategoryId], references: [id])
+  childCategory  Category @relation("ChildCategories", fields: [childCategoryId], references: [id])
+
+  // Ensure no duplicates for the same parent-child pair
+  @@unique([parentCategoryId, childCategoryId])
+}
+
+model FavoriteGame {
+  id        String       @id @default(uuid())
+  userId    String
+  gameId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  // Relations
+  user      User      @relation(fields: [userId], references: [id])
+  game      Game      @relation(fields: [gameId], references: [id])
+
+  @@unique([userId, gameId]) // Prevent duplicate favorites
+}
+
+model Guide {
+  id              String       @id @default(uuid())
+  title           String    @unique
+  gallery         String[]
+  url             String
+  info            String?
+  AuthenticAuthor String?
+  authorId        String
+  gameId          String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+  // Relations
+  author          Admin     @relation(fields: [authorId], references: [id])
+  Game            Game?     @relation(fields: [gameId], references: [id])
+}
+
+model Character {
+  id          String       @id @default(uuid())
+  name        String
+  splashArt   String
+  tierList    String
+  baseRooster String
+  description String?
+  archetype   Archetype 
+  showcase    String?
+  photo       String?
+  gameId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  game        Game      @relation(fields: [gameId], references: [id])
+}
+
+enum Archetype {
+  ALL_ROUNDER
+  MIX_UP
+  BAIT_PUNISH
+  GRAPPLER
+  GLASS_CANNON
+  RUSHDOWN
+  FOOTSIES
+  PRESSURER
+  HIT_RUN
+  ZONE_BREAKER
+  DOMINATING
+  ZONER
+  TRAPPER
+  TURTLE
+  KEEP_AWAY
+  STAGE_CONTROL
+  TAG_TEAM
+}
+
+enum Role {
+  SUPER_ADMIN
+  SUB_ADMIN
+  MODERATOR
+}
+
+enum Permission {
+  CREATE_GAME
+  UPDATE_GAME
+  DELETE_GAME
+  MANAGE_USERS
+  UPDATE_GUIDE
+  CREATE_GUIDE
+  DELETE_GUIDE
+}
+
+enum Status {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  BLOCKED
+}

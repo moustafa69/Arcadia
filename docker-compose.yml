@@ -3,9 +3,13 @@ services:
   dev-db:
     image: postgres:13
     ports:
-      - "5432:5432"
+      - ${EX_PORT}:${PORT}
     environment:
-      - POSTGRES_USER=${DB_USERNAME}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=arcadia
-      
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    networks:
+      - ${NETWORK_NAME}
+networks:
+  arcadia:
+    
