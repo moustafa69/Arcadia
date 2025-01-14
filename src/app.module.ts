@@ -1,10 +1,21 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AdminAppModule } from './modules/admin/admin-app.module';
+import { GuideAppModule } from './modules/guide/guide-app.module';
+import { UserAppModule } from './modules/user/user-app.module';
+import { CharacterAppModule } from './modules/character/character-app.module';
+import { GameAppModule } from './modules/game/game-app.module';
+import { CategoryAppModule } from './modules/category/category-app.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    AdminAppModule,
+    UserAppModule,
+    GameAppModule,
+    CategoryAppModule,
+    GuideAppModule,
+    CharacterAppModule,
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
