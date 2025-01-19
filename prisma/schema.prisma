@@ -22,6 +22,7 @@ model User {
   password  String
   picture   String?
   favorites FavoriteGame[]
+  DOB       DateTime?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   deletedAt DateTime?
@@ -30,15 +31,15 @@ model User {
 }
 
 model Admin {
-  id          String    @id @default(uuid())
+  id          String        @id @default(uuid())
   name        String
-  username    String    @unique
-  email       String    @unique
+  username    String        @unique
+  email       String        @unique
   password    String
-  role        String
-  permissions String[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  role        Role          @default(MODERATOR)
+  permissions Permissions[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   deletedAt   DateTime?
 
   // Relations
@@ -70,7 +71,7 @@ model Game {
 
   // Relations
   createdBy Admin    @relation(fields: [adminId], references: [id])
-  category  Category @relation(fields: [categoryId], references: [id])
+  category  Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@index([title])
   @@index([categoryId])
@@ -109,7 +110,7 @@ model CategoryRelationship {
 }
 
 model FavoriteGame {
-  id        String       @id @default(uuid())
+  id        String    @id @default(uuid())
   userId    String
   gameId    String
   createdAt DateTime  @default(now())
@@ -123,7 +124,7 @@ model FavoriteGame {
 }
 
 model Guide {
-  id              String       @id @default(uuid())
+  id              String    @id @default(uuid())
   title           String    @unique
   gallery         String[]
   url             String
@@ -140,13 +141,13 @@ model Guide {
 }
 
 model Character {
-  id          String       @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   splashArt   String
   tierList    String
   baseRooster String
   description String?
-  archetype   Archetype 
+  archetype   Archetype
   showcase    String?
   photo       String?
   gameId      String
@@ -155,7 +156,7 @@ model Character {
   deletedAt   DateTime?
 
   // Relations
-  game        Game      @relation(fields: [gameId], references: [id])
+  game Game @relation(fields: [gameId], references: [id])
 }
 
 enum Archetype {
@@ -184,14 +185,11 @@ enum Role {
   MODERATOR
 }
 
-enum Permission {
-  CREATE_GAME
-  UPDATE_GAME
-  DELETE_GAME
-  MANAGE_USERS
-  UPDATE_GUIDE
-  CREATE_GUIDE
-  DELETE_GUIDE
+enum Permissions {
+  MANAGE_ADMINS // for super Admin only
+  MANAGE_USERS // for super and sub admins
+  MANAGE_GAMES // for super, sub and mods
+  MANAGE_GUIDES
 }
 
 enum Status {

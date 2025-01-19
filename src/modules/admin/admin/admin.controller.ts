@@ -1,15 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('admins/auth')
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post()
-  create(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.create(createAdminDto);
+  async create(@Body() createAdminDto: CreateAdminDto) {
+    const admin = this.adminService.create(createAdminDto);
+    return {
+      Message: 'Admin Created Successfully',
+      admin,
+    };
   }
 
   @Get()

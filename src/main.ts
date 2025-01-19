@@ -8,7 +8,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   const config = new DocumentBuilder()
-    .setTitle('ARCADIA ')
+    .setTitle('ARCADIA')
     .setDescription('Fighting Games Mania')
     .setVersion('1.0')
     .addBearerAuth()

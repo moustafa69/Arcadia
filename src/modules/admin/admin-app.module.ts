@@ -1,7 +1,17 @@
 import { Module } from '@nestjs/common';
+import { AdminModule } from './admin/admin.module';
+import { RouterModule } from '@nestjs/core';
 
 @Module({
-  imports: [],
+  imports: [
+    //Register all modules
+
+    AdminModule,
+
+    //Route all modules
+
+    RouterModule.register([{ path: 'admins/admin', module: AdminModule }]),
+  ],
   providers: [],
   exports: [],
 })
