@@ -21,6 +21,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { AtGuard, RtGuard } from './guards';
 import { ForgetPasswordAdminDto } from './dto';
+import { GetIdentity } from 'src/common/decorators';
+import { identity } from 'rxjs';
+import { AdminIdentity } from '../shared/identity';
 
 @ApiTags('auth/admins')
 @Controller({ path: 'admin', version: VERSION_NEUTRAL })
@@ -60,18 +63,16 @@ export class AdminController {
   @UseGuards(RtGuard)
   @ApiBearerAuth()
   @Post('/refresh')
-  async refreshTokens(@Req() req: Request) {
-    const data = await this.adminService.refreshTokens(
-      req['user'].refreshToken,
-    );
+  async refreshTokens(@GetIdentity('refreshToken') refreshToken: string) {
+    const data = await this.adminService.refreshTokens(refreshToken);
     return { Message: 'Tokens Refreshed Successfully', data };
   }
 
   @UseGuards(AtGuard)
   @ApiBearerAuth()
   @Post('/logout')
-  async logout(@Req() req: Request) {
-    await this.adminService.logout(req['user'].id);
+  async logout(@GetIdentity() identity: AdminIdentity) {
+    await this.adminService.logout(identity.id);
     return { Message: 'Logged Out Successfully' };
   }
 }

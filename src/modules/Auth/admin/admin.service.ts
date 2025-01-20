@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterAdminDto } from './dto/register-admin.dto';
@@ -21,7 +22,7 @@ import { MailService } from '../../../common/services/mail-service/mail.service'
 import { resetPasswordTemplate } from 'src/common/services/mail-service/templates/templates';
 
 @Injectable()
-export class AdminService {
+export class AdminService implements OnModuleInit {
   protected readonly redis: Redis;
   constructor(
     private config: ConfigService,
@@ -33,9 +34,10 @@ export class AdminService {
     this.redis = redisService.getClient();
   }
   async register({ name, username, email, password }: RegisterAdminDto) {
-    if (await this.checkSuper())
-      throw new UnauthorizedException('Super Admin Already Exists');
-
+    if (await this.checkSuper()) {
+      console.log('Super Admin Already Exsist');
+      return;
+    }
     const hashedPassword = await this.hashData(password);
     const admin = await this.prisma.admin.create({
       data: {
@@ -54,6 +56,9 @@ export class AdminService {
     });
     const adminId = admin.id;
     const tokens = await this.generateTokens(admin);
+    console.log('Super Admin Created');
+
+    //TODO remove the return for the admin id and tokens, (this is for the super admin creation only)
 
     return { admin: adminId, ...tokens };
   }
@@ -189,5 +194,15 @@ export class AdminService {
     this.redis.set(`RESET-CODE-${email}`, resetCode, 'EX', 300);
 
     return resetCode;
+  }
+
+  async onModuleInit() {
+    //create super admin on module initialization
+    await this.register({
+      name: this.config.get('SUPER_ADMIN_NAME'),
+      email: this.config.get('SUPER_ADMIN_EMAIL'),
+      username: this.config.get('SUPER_ADMIN_USERNAME'),
+      password: this.config.get('SUPER_ADMIN_PASSWORD'),
+    });
   }
 }

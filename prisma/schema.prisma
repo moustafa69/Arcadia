@@ -127,7 +127,7 @@ model Guide {
   id              String    @id @default(uuid())
   title           String    @unique
   gallery         String[]
-  url             String
+  url             String?
   info            String?
   AuthenticAuthor String?
   authorId        String
@@ -160,23 +160,12 @@ model Character {
 }
 
 enum Archetype {
-  ALL_ROUNDER
+  ALL_ROUNDER_SHOTO
   MIX_UP
-  BAIT_PUNISH
   GRAPPLER
-  GLASS_CANNON
   RUSHDOWN
-  FOOTSIES
-  PRESSURER
-  HIT_RUN
-  ZONE_BREAKER
-  DOMINATING
   ZONER
-  TRAPPER
-  TURTLE
-  KEEP_AWAY
-  STAGE_CONTROL
-  TAG_TEAM
+  POWER
 }
 
 enum Role {
