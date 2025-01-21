@@ -6,43 +6,77 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ListAllAdminsQueryDto } from './dto/list-all-admins-query.dto';
+import { AdminIdParamDto } from './dto/admin-id-param.dto';
+import { AtGuard } from 'src/modules/Auth/admin/guards';
+import { SuperAdmin } from './guards/super-admin.guard';
 
-@ApiTags('admins/auth')
-@Controller('admin')
+@ApiTags('admins')
+@Controller()
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @UseGuards(AtGuard, SuperAdmin)
+  @ApiBearerAuth()
   @Post()
-  async create(@Body() createAdminDto: CreateAdminDto) {
-    const admin = this.adminService.create(createAdminDto);
+  async create(@Body() body: CreateAdminDto) {
+    const admin = this.adminService.create(body);
     return {
       Message: 'Admin Created Successfully',
       admin,
     };
   }
 
+  @UseGuards(AtGuard, SuperAdmin)
+  @ApiBearerAuth()
   @Get()
-  findAll() {
-    return this.adminService.findAll();
+  async findAll(@Query() query: ListAllAdminsQueryDto) {
+    const data = await this.adminService.listAllAdmins(query);
+    return { Message: 'Success', data };
   }
 
+  @UseGuards(AtGuard, SuperAdmin)
+  @ApiBearerAuth()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminService.findOne(+id);
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the admin',
+    required: true,
+  })
+  async findOne(@Param() param: AdminIdParamDto) {
+    const data = await this.adminService.findOne(param);
+    return { Message: 'Success', data };
   }
 
+  @UseGuards(AtGuard, SuperAdmin)
+  @ApiBearerAuth()
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(+id, updateAdminDto);
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the admin',
+    required: true,
+  })
+  update(@Param() param: AdminIdParamDto, @Body() body: UpdateAdminDto) {
+    return this.adminService.update(param, body);
   }
 
+  @UseGuards(AtGuard, SuperAdmin)
+  @ApiBearerAuth()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminService.remove(+id);
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the admin',
+    required: true,
+  })
+  async delete(@Param() param: AdminIdParamDto) {
+    await this.adminService.delete(param);
+    return { Message: 'Admin Deleted Successfully' };
   }
 }

@@ -10,7 +10,7 @@ import { RouterModule } from '@nestjs/core';
 
     //Route all modules
 
-    RouterModule.register([{ path: 'admins/admin', module: AdminModule }]),
+    RouterModule.register([{ path: 'admins', module: AdminModule }]),
   ],
   providers: [],
   exports: [],

@@ -32,14 +32,5 @@ export class CreateAdminDto {
   })
   @IsOptional()
   @IsEnum(Role)
-  role?: Role = Role.MODERATOR;
-
-  @IsOptional()
-  @IsEnum(Permissions, {
-    each: true,
-    message: `Permissions must be an array of valid permissions: ${Object.values(
-      Permissions,
-    ).join(', ')}`,
-  })
-  permissions?: Permissions[];
+  role?: Role;
 }

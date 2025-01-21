@@ -1,10 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
-import { PrismaClient } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/common/prisma/prisma.service';
+import { ListAllAdminsQueryDto } from './dto/list-all-admins-query.dto';
+import { AdminIdParamDto } from './dto/admin-id-param.dto';
+
 @Injectable()
 export class AdminService {
   constructor(
@@ -17,6 +23,7 @@ export class AdminService {
     const admin = await this.prisma.admin.findFirst({
       where: {
         OR: [{ email: email }, { username: username }],
+        deletedAt: null,
       },
     });
 
@@ -24,20 +31,89 @@ export class AdminService {
     //const hashedPassword = await this.hashingPassword(password);
   }
 
-  findAll() {
-    return `This action returns all admin`;
+  async listAllAdmins({ page, limit, role }: ListAllAdminsQueryDto) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.admin.findMany({
+        skip,
+        take: limit,
+        where: role ? { role } : {},
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          role: true,
+        },
+      }),
+      this.prisma.admin.count(),
+    ]);
+
+    return {
+      data,
+      total,
+      limit,
+      page,
+      pages: Math.ceil(total / limit),
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} admin`;
+  async findOne({ id }: AdminIdParamDto) {
+    try {
+      const admin = await this.prisma.admin.findFirst({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          role: true,
+          email: true,
+          createdAt: true,
+          updatedAt: true,
+          deletedAt: true,
+        },
+      });
+      if (!admin) throw new NotFoundException('Admin Not Found');
+
+      return admin;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  update(id: number, updateAdminDto: UpdateAdminDto) {
-    return `This action updates a #${id} admin`;
+  async update(
+    { id }: AdminIdParamDto,
+    { name, username, email, password, role }: UpdateAdminDto,
+  ) {
+    try {
+      const admin = await this.prisma.admin.findFirst({ where: { id } });
+      if (!admin) throw new NotFoundException('Admin Not Found');
+
+      const updatedAdmin = await this.prisma.admin.update({
+        where: { id },
+        data: { name, username, email, password, role },
+        select: {
+          name: true,
+          username: true,
+          email: true,
+          role: true,
+        },
+      });
+      return updatedAdmin;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} admin`;
+  async delete({ id }: AdminIdParamDto) {
+    try {
+      const admin = await this.prisma.admin.findFirst({ where: { id } });
+      if (!admin) throw new NotFoundException('Admin Not found');
+
+      await this.prisma.admin.delete({ where: { id } });
+    } catch (error) {
+      throw error;
+    }
   }
 
   private async hashingPassword(password: string): Promise<string> {

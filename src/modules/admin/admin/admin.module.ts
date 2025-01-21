@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
-import { PrismaService } from 'src/common/prisma/prisma.service';
-import { PrismaClient } from '@prisma/client';
-import { PrismaModule } from 'src/common/prisma/prisma.module';
+import { SuperAdminStrategy } from './strategies/super-admin.strategy';
+import { AccessTokenAdminStrategy } from 'src/modules/Auth/admin/strategies';
 
 @Module({
   imports: [],
   controllers: [AdminController],
-  providers: [AdminService],
+  providers: [AdminService, SuperAdminStrategy, AccessTokenAdminStrategy],
 })
 export class AdminModule {}
