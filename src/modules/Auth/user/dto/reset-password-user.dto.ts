@@ -7,7 +7,7 @@ import {
   Matches,
 } from 'class-validator';
 
-export class ResetPasswordAdminDto {
+export class ResetPasswordUserDto {
   @IsNumber()
   @ApiProperty({
     example: '123456',

@@ -34,15 +34,15 @@ export class AdminController {
 
   @Post('public/signup')
   @HttpCode(HttpStatus.CREATED)
-  async Register(@Body() registerAdmindto: RegisterAdminDto) {
-    const data = await this.adminService.register(registerAdmindto);
+  async Register(@Body() body: RegisterAdminDto) {
+    const data = await this.adminService.register(body);
     return { Message: 'Admin Created Successfully', data };
   }
 
   @Post('public/login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginAdminDto: LogniAdminDto) {
-    const data = await this.adminService.login(loginAdminDto);
+  async login(@Body() body: LogniAdminDto) {
+    const data = await this.adminService.login(body);
     return { Message: 'Logged in successfully', data };
   }
 
@@ -55,8 +55,8 @@ export class AdminController {
 
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordAdminDto) {
-    await this.adminService.resetPassword(resetPasswordDto);
+  async resetPassword(@Body() body: ResetPasswordAdminDto) {
+    await this.adminService.resetPassword(body);
     return { Message: 'Password Reset Success' };
   }
 

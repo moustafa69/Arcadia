@@ -21,12 +21,14 @@ model User {
   status    Status         @default(PENDING)
   password  String
   picture   String?
-  favorites FavoriteGame[]
   DOB       DateTime?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   deletedAt DateTime?
 
+  //Relations
+  favorites FavoriteGame[]
+  
   @@index([email])
 }
 

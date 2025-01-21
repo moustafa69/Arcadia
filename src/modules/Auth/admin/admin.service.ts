@@ -12,14 +12,14 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { Admin, Permissions, Role } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
-import { tokens } from './types';
+import { tokens } from '../shared/types';
 import Redis from 'ioredis';
 import { v4 as uuidV4, v5 as uuidV5 } from 'uuid';
 import { ResetPasswordAdminDto } from './dto';
 import { RedisService } from '@songkeys/nestjs-redis';
-import { RefreshTokenPayload } from './interfaces';
 import { MailService } from '../../../common/services/mail-service/mail.service';
 import { resetPasswordTemplate } from 'src/common/services/mail-service/templates/templates';
+import { RefreshTokenPayload } from '../shared/interfaces';
 
 @Injectable()
 export class AdminService implements OnModuleInit {

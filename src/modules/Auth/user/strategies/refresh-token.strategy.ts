@@ -6,14 +6,14 @@ import { Injectable } from '@nestjs/common';
 import { RefreshTokenPayload } from '../../shared/interfaces';
 
 @Injectable()
-export class RefreshTokenAdminStrategy extends PassportStrategy(
+export class RefreshTokenUserStrategy extends PassportStrategy(
   Strategy,
-  'rt-admin',
+  'rt-user',
 ) {
   constructor(private _config: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: _config.get('ADMIN_JWT_REFRESH_SECRET'),
+      secretOrKey: _config.get('USER_JWT_REFRESH_SECRET'),
       passReqToCallback: true,
     });
   }
