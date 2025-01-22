@@ -39,7 +39,7 @@ export class AdminService implements OnModuleInit {
       return;
     }
     const hashedPassword = await this.hashData(password);
-    const admin = await this.prisma.admin.create({
+    await this.prisma.admin.create({
       data: {
         name,
         username,
@@ -54,13 +54,8 @@ export class AdminService implements OnModuleInit {
         ],
       },
     });
-    const adminId = admin.id;
-    const tokens = await this.generateTokens(admin);
+
     console.log('Super Admin Created');
-
-    //TODO remove the return for the admin id and tokens, (this is for the super admin creation only)
-
-    return { admin: adminId, ...tokens };
   }
 
   async login({ email, password }: LogniAdminDto) {

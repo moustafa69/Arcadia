@@ -27,10 +27,9 @@ export class AdminController {
   @ApiBearerAuth()
   @Post()
   async create(@Body() body: CreateAdminDto) {
-    const admin = this.adminService.create(body);
+    await this.adminService.create(body);
     return {
       Message: 'Admin Created Successfully',
-      admin,
     };
   }
 

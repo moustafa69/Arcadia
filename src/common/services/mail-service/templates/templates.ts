@@ -122,3 +122,88 @@ export function verifyEmailTemplate(code: number) {
 </html>
 `;
 }
+
+export function adminCreationTemplate(email: string, password: string) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to the Team</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      padding: 10px 0;
+    }
+    .header h1 {
+      color: #4caf50;
+    }
+    .content {
+      padding: 20px;
+    }
+    .credentials {
+      background: #f4f4f9;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      color: #fff;
+      background-color: #4caf50;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 20px;
+      text-align: center;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎉 Welcome to the Team!</h1>
+    </div>
+    <div class="content">
+      <p>Dear <strong>New Admin</strong>,</p>
+      <p>Congratulations on becoming a part of our platform! 🎉 We are thrilled to have you onboard as one of our valued administrators.</p>
+      <div class="credentials">
+        <p><strong>Your Login Credentials:</strong></p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Password:</strong> ${password}</p>
+      </div>
+      <p>To ensure the security of your account, please log in and change your password at your earliest convenience.</p>
+      <p>As an admin, you play a critical role in managing and enhancing our platform. If you have any questions, concerns, or need assistance, feel free to reach out to our support team.</p>
+      <p>Once again, welcome aboard! We're excited to see the amazing contributions you'll make.</p>
+    </div>
+    <div class="footer">
+      <p>Best regards,</p>
+      <p>ARCADIA</p>
+    </div>
+  </div>
+</body>
+</html>
+`;
+}

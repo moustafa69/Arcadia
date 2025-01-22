@@ -10,16 +10,22 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { ListAllAdminsQueryDto } from './dto/list-all-admins-query.dto';
 import { AdminIdParamDto } from './dto/admin-id-param.dto';
+import { RoleToPermissionsMap } from './utils';
+import {
+  IMailContent,
+  MailService,
+} from 'src/common/services/mail-service/mail.service';
+import { adminCreationTemplate } from 'src/common/services/mail-service/templates/templates';
 
 @Injectable()
 export class AdminService {
   constructor(
     private prisma: PrismaService,
     private config: ConfigService,
+    private mailService: MailService,
   ) {}
 
-  async create(createAdminDto: CreateAdminDto) {
-    const { email, password, username } = createAdminDto;
+  async create({ email, username, password, name, role }: CreateAdminDto) {
     const admin = await this.prisma.admin.findFirst({
       where: {
         OR: [{ email: email }, { username: username }],
@@ -28,7 +34,24 @@ export class AdminService {
     });
 
     if (admin) throw new UnauthorizedException('Admin Already exists');
-    //const hashedPassword = await this.hashingPassword(password);
+    const permissions = RoleToPermissionsMap[role];
+    const hashedPassword = await this.hashingPassword(password);
+    await this.prisma.admin.create({
+      data: {
+        name,
+        email,
+        username,
+        role,
+        permissions,
+        password: hashedPassword,
+      },
+    });
+    const mssg: IMailContent = {
+      email,
+      subject: 'Arcadia Admin Account Creation',
+      html: adminCreationTemplate(email, password),
+    };
+    await this.mailService.sendMail(mssg);
   }
 
   async listAllAdmins({ page, limit, role }: ListAllAdminsQueryDto) {
@@ -117,7 +140,7 @@ export class AdminService {
   }
 
   private async hashingPassword(password: string): Promise<string> {
-    const saltRounds = this.config.get('SALT_ROUNDS');
+    const saltRounds = Number(this.config.get('SALT_ROUNDS'));
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     return hashedPassword;
   }
