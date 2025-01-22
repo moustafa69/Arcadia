@@ -10,7 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { ListAllAdminsQueryDto } from './dto/list-all-admins-query.dto';
 import { AdminIdParamDto } from './dto/admin-id-param.dto';
-import { RoleToPermissionsMap } from './utils';
+import { RoleToPermissionsMap } from '../shared/utils';
 import {
   IMailContent,
   MailService,
@@ -104,17 +104,14 @@ export class AdminService {
     }
   }
 
-  async update(
-    { id }: AdminIdParamDto,
-    { name, username, email, password, role }: UpdateAdminDto,
-  ) {
+  async update({ id }: AdminIdParamDto, { role }: UpdateAdminDto) {
     try {
       const admin = await this.prisma.admin.findFirst({ where: { id } });
       if (!admin) throw new NotFoundException('Admin Not Found');
 
       const updatedAdmin = await this.prisma.admin.update({
         where: { id },
-        data: { name, username, email, password, role },
+        data: { role },
         select: {
           name: true,
           username: true,

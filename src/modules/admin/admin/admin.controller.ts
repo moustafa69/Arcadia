@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  VERSION_NEUTRAL,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
@@ -16,10 +17,10 @@ import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ListAllAdminsQueryDto } from './dto/list-all-admins-query.dto';
 import { AdminIdParamDto } from './dto/admin-id-param.dto';
 import { AtGuard } from 'src/modules/Auth/admin/guards';
-import { SuperAdmin } from './guards/super-admin.guard';
+import { SuperAdmin } from '../shared/guards/super-admin.guard';
 
 @ApiTags('admins')
-@Controller()
+@Controller({ version: VERSION_NEUTRAL })
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
