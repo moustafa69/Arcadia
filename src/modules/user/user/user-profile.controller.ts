@@ -6,39 +6,49 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+
 import { UserProfileService } from './user-profile.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AtGuard } from 'src/modules/Auth/user/guards';
+import { GetIdentity } from 'src/common/decorators';
+import { UserIdentity } from 'src/modules/Auth/shared/identity';
+import { ChangePasswordUserDto } from './dto/change-user-password.dto';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
 @ApiTags('users/user')
 @Controller()
 export class UserProfileController {
-  constructor(private readonly userService: UserProfileService) {}
+  constructor(private readonly userProfileService: UserProfileService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
+  @UseGuards(AtGuard)
+  @ApiBearerAuth()
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async getProfile(@GetIdentity() identity: UserIdentity) {
+    const data = await this.userProfileService.getProfile(identity);
+    return { Message: 'Success', data };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @UseGuards(AtGuard)
+  @ApiBearerAuth()
+  @Patch()
+  async updateProfile(
+    @GetIdentity() identity: UserIdentity,
+    @Body() body: UpdateUserProfileDto,
+  ) {
+    const data = await this.userProfileService.updateProfile(identity, body);
+    return { Message: 'Profile Updated Successfully', data };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @UseGuards(AtGuard)
+  @ApiBearerAuth()
+  @Patch('change-password')
+  async changePassword(
+    @GetIdentity() identity: UserIdentity,
+    @Body() body: ChangePasswordUserDto,
+  ) {
+    await this.userProfileService.changePassword(identity, body);
+    return { Message: 'Password Updated Successfully' };
   }
 }

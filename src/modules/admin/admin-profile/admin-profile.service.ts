@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -62,6 +63,9 @@ export class AdminProfileService {
 
       if (oldPassword === newPassword)
         throw new ConflictException('Passwords are the same');
+
+      if ((await this.hashingPassword(oldPassword)) !== admin.password)
+        throw new BadRequestException('Invalid Old Password');
 
       const newHashedPassword = await this.hashingPassword(newPassword);
       await this.prisma.admin.update({
