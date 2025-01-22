@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { UserService } from './user.service';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserProfileService } from './user-profile.service';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@ApiTags('users/user')
+@Controller()
+export class UserProfileController {
+  constructor(private readonly userService: UserProfileService) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {

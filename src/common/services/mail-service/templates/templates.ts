@@ -207,3 +207,175 @@ export function adminCreationTemplate(email: string, password: string) {
 </html>
 `;
 }
+
+export function suspendUserTemplate(username: string, reason: string) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Suspension</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      background-color: #dc3545;
+      padding: 20px;
+      color: #fff;
+      border-radius: 8px 8px 0 0;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .content {
+      padding: 20px;
+    }
+    .content p {
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #666;
+    }
+    .contact {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      color: #fff;
+      background-color: #007bff;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Account Suspension Notice</h1>
+    </div>
+    <div class="content">
+      <p>Dear <strong>${username}</strong>,</p>
+      <p>We regret to inform you that your account has been <strong>suspended</strong> as of ${new Date()}. This action has been taken due to the following reason(s):</p>
+      <ul>
+        <li>${reason}</li>
+      </ul>
+      <p>If you believe this action was taken in error or would like to discuss your account status further, please contact us using the information below.</p>
+      <p>We value our community and strive to maintain a safe and fair environment for all users.</p>
+      <div class="contact">
+        <p>If you have any questions or need assistance, please reach out to us:</p>
+      </div>
+    </div>
+    <div class="footer">
+      <p>Thank you,</p>
+      <p>The ARCADIA Team</p>
+    </div>
+  </div>
+</body>
+</html>
+`;
+}
+
+export function activateUserTemplate(username: string) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Reactivation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      background-color: #17a2b8;
+      padding: 20px;
+      color: #fff;
+      border-radius: 8px 8px 0 0;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .content {
+      padding: 20px;
+    }
+    .content p {
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #666;
+    }
+    .button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      color: #fff;
+      background-color: #007bff;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Account Reactivated</h1>
+    </div>
+    <div class="content">
+      <p>Dear <strong>${username}</strong>,</p>
+      <p>We are pleased to inform you that your account has been <strong>reactivated</strong> as of ${new Date()}.</p>
+      <p>You can now log in and continue enjoying our services. We appreciate your understanding and cooperation during the suspension period.</p>
+      <p>If you have any questions or encounter any issues, please don’t hesitate to contact us. We’re here to help!</p>
+    </div>
+    <div class="footer">
+      <p>Thank you for choosing [Your Company Name],</p>
+      <p>The ARCADIA Team</p>
+    </div>
+  </div>
+</body>
+</html>
+`;
+}

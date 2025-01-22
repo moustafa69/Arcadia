@@ -9,6 +9,7 @@ import { PrismaModule } from './common/prisma/prisma.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthAppModule } from './modules/Auth/auth-app.module';
 import { RedisModule, RedisModuleOptions } from '@songkeys/nestjs-redis';
+import { MailService } from './common/services/mail-service/mail.service';
 @Module({
   imports: [
     RedisModule.forRootAsync({

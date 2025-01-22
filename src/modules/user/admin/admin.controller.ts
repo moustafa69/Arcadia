@@ -1,34 +1,78 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  VERSION_NEUTRAL,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
-
-@Controller('admin')
+import { UserIdParamDto } from './dto/user-id-param.dto';
+import { ListAllUsersQueryDto } from './dto/list-all-users-query.dto';
+import { AtGuard } from 'src/modules/Auth/admin/guards';
+import { SubAdmin } from 'src/modules/admin/shared/guards';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { SuspendUserDto } from './dto/suspend-user.dto';
+@ApiTags('users/admin')
+@Controller({ path: '', version: VERSION_NEUTRAL })
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @Post()
-  create(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.create(createAdminDto);
-  }
-
+  @UseGuards(AtGuard, SubAdmin)
+  @ApiBearerAuth()
   @Get()
-  findAll() {
-    return this.adminService.findAll();
+  async findAll(@Query() query: ListAllUsersQueryDto) {
+    const data = await this.adminService.findAll(query);
+    return {
+      Message: 'Success',
+      data,
+    };
   }
 
+  @UseGuards(AtGuard, SubAdmin)
+  @ApiBearerAuth()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminService.findOne(+id);
+  async findOne(@Param() param: UserIdParamDto) {
+    const data = await this.adminService.findOne(param);
+    return {
+      Message: 'Success',
+      data,
+    };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(+id, updateAdminDto);
+  @UseGuards(AtGuard, SubAdmin)
+  @ApiBearerAuth()
+  @Patch(':id/suspend')
+  async suspend(@Param() param: UserIdParamDto, @Body() body: SuspendUserDto) {
+    const data = await this.adminService.suspend(param, body);
+    return {
+      Message: 'User Suspended Successfully',
+      data,
+    };
   }
 
+  @UseGuards(AtGuard, SubAdmin)
+  @ApiBearerAuth()
+  @Patch(':id/activate')
+  async activate(@Param() param: UserIdParamDto) {
+    const data = await this.adminService.activate(param);
+    return {
+      Message: 'User Activated Successfully',
+      data,
+    };
+  }
+
+  @UseGuards(AtGuard, SubAdmin)
+  @ApiBearerAuth()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminService.remove(+id);
+  async remove(@Param() param: UserIdParamDto) {
+    await this.adminService.remove(param);
+    return {
+      Message: 'User Deleted Successfully',
+    };
   }
 }
