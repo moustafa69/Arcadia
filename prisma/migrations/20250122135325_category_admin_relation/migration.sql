@@ -1,11 +1,11 @@
 -- CreateEnum
-CREATE TYPE "Archetype" AS ENUM ('ALL_ROUNDER', 'MIX_UP', 'BAIT_PUNISH', 'GRAPPLER', 'GLASS_CANNON', 'RUSHDOWN', 'FOOTSIES', 'PRESSURER', 'HIT_RUN', 'ZONE_BREAKER', 'DOMINATING', 'ZONER', 'TRAPPER', 'TURTLE', 'KEEP_AWAY', 'STAGE_CONTROL', 'TAG_TEAM');
+CREATE TYPE "Archetype" AS ENUM ('ALL_ROUNDER_SHOTO', 'MIX_UP', 'GRAPPLER', 'RUSHDOWN', 'ZONER', 'POWER');
 
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('SUPER_ADMIN', 'SUB_ADMIN', 'MODERATOR');
 
 -- CreateEnum
-CREATE TYPE "Permission" AS ENUM ('CREATE_GAME', 'UPDATE_GAME', 'DELETE_GAME', 'MANAGE_USERS', 'UPDATE_GUIDE', 'CREATE_GUIDE', 'DELETE_GUIDE');
+CREATE TYPE "Permissions" AS ENUM ('MANAGE_ADMINS', 'MANAGE_USERS', 'MANAGE_GAMES', 'MANAGE_GUIDES');
 
 -- CreateEnum
 CREATE TYPE "Status" AS ENUM ('PENDING', 'ACTIVE', 'SUSPENDED', 'BLOCKED');
@@ -19,6 +19,7 @@ CREATE TABLE "User" (
     "status" "Status" NOT NULL DEFAULT 'PENDING',
     "password" TEXT NOT NULL,
     "picture" TEXT,
+    "DOB" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
@@ -33,8 +34,8 @@ CREATE TABLE "Admin" (
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "role" TEXT NOT NULL,
-    "permissions" TEXT[],
+    "role" "Role" NOT NULL DEFAULT 'MODERATOR',
+    "permissions" "Permissions"[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
@@ -72,6 +73,7 @@ CREATE TABLE "Category" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
+    "createdById" TEXT NOT NULL,
 
     CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
 );
@@ -105,7 +107,7 @@ CREATE TABLE "Guide" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "gallery" TEXT[],
-    "url" TEXT NOT NULL,
+    "url" TEXT,
     "info" TEXT,
     "AuthenticAuthor" TEXT,
     "authorId" TEXT NOT NULL,
@@ -179,7 +181,10 @@ CREATE UNIQUE INDEX "Guide_title_key" ON "Guide"("title");
 ALTER TABLE "Game" ADD CONSTRAINT "Game_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "Admin"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Game" ADD CONSTRAINT "Game_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Game" ADD CONSTRAINT "Game_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Category" ADD CONSTRAINT "Category_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "Admin"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "CategoryRelationship" ADD CONSTRAINT "CategoryRelationship_parentCategoryId_fkey" FOREIGN KEY ("parentCategoryId") REFERENCES "Category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

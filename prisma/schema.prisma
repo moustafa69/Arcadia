@@ -14,21 +14,21 @@ datasource db {
 }
 
 model User {
-  id        String         @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
-  username  String         @unique
-  email     String         @unique
-  status    Status         @default(PENDING)
+  username  String    @unique
+  email     String    @unique
+  status    Status    @default(PENDING)
   password  String
   picture   String?
   DOB       DateTime?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   //Relations
   favorites FavoriteGame[]
-  
+
   @@index([email])
 }
 
@@ -45,8 +45,9 @@ model Admin {
   deletedAt   DateTime?
 
   // Relations
-  createdGames  Game[]
-  createdGuides Guide[]
+  createdGames      Game[]
+  createdGuides     Guide[]
+  createdCategories Category[]
 
   @@index([email])
 }
@@ -82,33 +83,19 @@ model Game {
 
 model Category {
   id          Int       @id @default(autoincrement())
-  name        String
+  name        String    @unique
   description String?
-  totalGames  Int       @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
+  deletedAt   DateTime? // TODO: Consider making it a boolean (isDeleted)
+  createdById String
+  parentId    Int? 
 
-  parentRels CategoryRelationship[] @relation("ParentCategories")
-  childRels  CategoryRelationship[] @relation("ChildCategories")
+  createdBy     Admin      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  parent        Category?  @relation("FK_Category_Id", fields: [parentId], references: [id], onDelete: Cascade)
+  subcategories Category[] @relation("FK_Category_Id") 
 
   Game Game[]
-}
-
-model CategoryRelationship {
-  id               Int       @id @default(autoincrement())
-  parentCategoryId Int
-  childCategoryId  Int
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  deletedAt        DateTime?
-
-  // Relations
-  parentCategory Category @relation("ParentCategories", fields: [parentCategoryId], references: [id])
-  childCategory  Category @relation("ChildCategories", fields: [childCategoryId], references: [id])
-
-  // Ensure no duplicates for the same parent-child pair
-  @@unique([parentCategoryId, childCategoryId])
 }
 
 model FavoriteGame {
@@ -187,5 +174,5 @@ enum Status {
   PENDING
   ACTIVE
   SUSPENDED
-  BLOCKED
+  BLOCKED //kinda using it later!
 }
