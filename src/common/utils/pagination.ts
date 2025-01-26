@@ -31,7 +31,7 @@ export class BasePaginationDto {
     },
   )
   @Min(1, { message: 'limit must be at least 1' })
-  limit: number;
+  limit: number = 10;
 
   @ApiProperty({
     description: 'Page',
@@ -47,5 +47,5 @@ export class BasePaginationDto {
     },
   )
   @Min(1, { message: 'page must be at least 1' })
-  page: number;
+  page: number = 1;
 }

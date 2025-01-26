@@ -4,6 +4,7 @@ import { ListGameQueryDto } from './dto/list-game-query.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { NotFoundError } from 'rxjs';
 import { UserIdentity } from 'src/modules/Auth/shared/identity';
+import { title } from 'process';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
@@ -53,7 +54,11 @@ export class UserService {
     });
 
     if (!game) throw new NotFoundException('Game Not Found');
-    return game;
+    return {
+      game,
+      guidesCount: game.guides.length, //TODO maybe change the logic of guides number and characters number later
+      charactersCount: game.characters.length,
+    };
   }
 
   async findGameCharacters({ id }: GameIdParamDto) {
@@ -101,7 +106,7 @@ export class UserService {
       if (error.code === 'P2025') {
         throw new NotFoundException('Game Not Found');
       }
-      throw error; // Handle other errors
+      throw error;
     }
   }
 
@@ -115,6 +120,8 @@ export class UserService {
     netCodeType: true,
     coverPhoto: true,
     timesFavorited: true,
+    guides: { select: { title: true, url: true } },
+    characters: { select: { name: true, splashArt: true } },
     category: { select: { name: true } },
     createdBy: { select: { name: true } },
   };
