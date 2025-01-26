@@ -3,6 +3,7 @@ import { GameIdParamDto } from './dto/game-id-param.dto';
 import { ListGameQueryDto } from './dto/list-game-query.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { NotFoundError } from 'rxjs';
+import { UserIdentity } from 'src/modules/Auth/shared/identity';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
@@ -73,6 +74,35 @@ export class UserService {
 
     if (!game) throw new NotFoundException('Game Not Found');
     return game;
+  }
+
+  async favoriteGame(identity: UserIdentity, { id }: GameIdParamDto) {
+    try {
+      await this.prisma.game.update({
+        where: { id },
+        data: {
+          timesFavorited: { increment: 1 },
+        },
+      });
+
+      const favoritedGame = await this.prisma.favoriteGame.create({
+        data: {
+          userId: identity.id,
+          gameId: id,
+        },
+        select: {
+          user: { select: { name: true } },
+          game: { select: { title: true, timesFavorited: true } },
+        },
+      });
+
+      return favoritedGame;
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new NotFoundException('Game Not Found');
+      }
+      throw error; // Handle other errors
+    }
   }
 
   private selectStage = {

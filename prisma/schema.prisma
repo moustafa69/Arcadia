@@ -118,8 +118,8 @@ model Guide {
   gallery         String[]
   url             String?
   info            String?
-  AuthenticAuthor String?
-  authorId        String
+  AuthenticAuthor String? // the real person who wrote the guide
+  authorId        String // the admin who made the guide
   gameId          String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt

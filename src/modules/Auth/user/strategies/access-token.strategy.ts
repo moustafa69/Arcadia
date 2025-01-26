@@ -6,6 +6,7 @@ import Redis from 'ioredis';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { UserAccessTokenPayload } from '../interfaces/access-token-payload.interface';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class AccessTokenUserStrategy extends PassportStrategy(
@@ -28,6 +29,12 @@ export class AccessTokenUserStrategy extends PassportStrategy(
   async validate(payload: UserAccessTokenPayload) {
     const userSession = await this.redis.get(payload.id);
     if (!userSession) throw new UnauthorizedException('Session Expired');
+
+    // const user = await this.prisma.user.findFirst({
+    //   where: { id: payload.id, deletedAt: null, status: Status.ACTIVE },
+    // });
+
+    // if (!user) throw new UnauthorizedException('Access Denied');
     return payload;
   }
 }
