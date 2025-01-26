@@ -1,34 +1,63 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
-
-@Controller('admin')
+import { CreateCharacterDto } from './dto/create-character.dto';
+import { UpdateCharacterDto } from './dto/update-character.dto';
+import { query } from 'express';
+import { ListCharacterQueryDto } from './dto/list-all-characters-query.dto';
+import { CharacterIdParamDto } from './dto/character-id-param.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AtGuard } from 'src/modules/Auth/admin/guards';
+@ApiTags('characters/admin')
+@UseGuards(AtGuard)
+@Controller()
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @ApiBearerAuth()
   @Post()
-  create(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.create(createAdminDto);
+  async create(@Body() body: CreateCharacterDto) {
+    const data = await this.adminService.create(body);
+    return { Message: 'Character Created Successfully', data };
   }
 
+  @ApiBearerAuth()
   @Get()
-  findAll() {
-    return this.adminService.findAll();
+  async findAll(@Query() query: ListCharacterQueryDto) {
+    const data = await this.adminService.findAll(query);
+    return { Message: 'Success', data };
   }
 
+  @ApiBearerAuth()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminService.findOne(+id);
+  async findOne(@Param() param: CharacterIdParamDto) {
+    const data = await this.adminService.findOne(param);
+    return { Message: 'Success', data };
   }
 
+  @ApiBearerAuth()
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(+id, updateAdminDto);
+  async update(
+    @Param() param: CharacterIdParamDto,
+    @Body() body: UpdateCharacterDto,
+  ) {
+    const data = await this.adminService.update(param, body);
+    return { Message: 'Character Updated Successfully', data };
   }
 
+  @ApiBearerAuth()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminService.remove(+id);
+  async remove(@Param() param: CharacterIdParamDto) {
+    await this.adminService.remove(param);
+    return { Message: 'Character Deleted Successfully' };
   }
 }
