@@ -1,42 +1,69 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  VERSION_NEUTRAL,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { GetIdentity } from 'src/common/decorators';
+import { AtGuard } from 'src/modules/Auth/admin/guards';
+import { AdminIdentity } from 'src/modules/Auth/shared/identity';
 import { AdminService } from './admin.service';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
+import { CreateGameDto } from './dto/create-game.dto';
+import { GameIdParamDto } from './dto/game-id-param.dto';
+import { ListGameQueryDto } from './dto/list-game-query.dto';
+import { UpdateGameDto } from './dto/update-game.dto';
 
-@Controller('admin')
+@ApiTags('Game/admin')
+@UseGuards(AtGuard)
+@Controller({ version: VERSION_NEUTRAL })
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @ApiBearerAuth()
   @Post()
-  create(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.create(createAdminDto);
+  async create(
+    @GetIdentity() identity: AdminIdentity,
+    @Body() body: CreateGameDto,
+  ) {
+    const data = await this.adminService.create(identity, body);
+    return { Message: 'Game Created Successfully', data };
   }
 
+  @ApiBearerAuth()
   @Get()
-  findAll() {
-    return this.adminService.findAll();
+  async findAll(@Query() query: ListGameQueryDto) {
+    const data = await this.adminService.findAll(query);
+    return { Message: 'Success', data };
   }
 
+  @ApiBearerAuth()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminService.findOne(+id);
+  async findOne(@Param() param: GameIdParamDto) {
+    const data = await this.adminService.findOne(param);
+    return { Message: 'Success', data };
   }
 
+  @ApiBearerAuth()
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(+id, updateAdminDto);
+  async update(
+    @Param() param: GameIdParamDto,
+    @Body() updateAdminDto: UpdateGameDto,
+  ) {
+    const data = await this.adminService.update(param, updateAdminDto);
+    return { Message: 'Game Updated Successfully', data };
   }
 
+  @ApiBearerAuth()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminService.remove(+id);
+  async remove(@Param() param: GameIdParamDto) {
+    await this.adminService.remove(param);
+    return { Message: 'Game Deleted Successfully' };
   }
 }
