@@ -40,7 +40,7 @@ export class AdminService {
           status: true,
         },
       }),
-      this.prisma.admin.count(),
+      this.prisma.user.count(),
     ]);
 
     return {
