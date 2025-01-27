@@ -39,7 +39,7 @@ export class AdminService {
   }
 
   async findOne({ id }: CategoryIdParamDto) {
-    const category: Partial<Category>[] = await this.prisma.category.findMany({
+    const category: Partial<Category> = await this.prisma.category.findFirst({
       where: { id, deletedAt: null },
       select: {
         id: true,
@@ -48,7 +48,9 @@ export class AdminService {
         createdAt: true,
         createdBy: { select: { name: true } },
         parent: { select: { id: true, name: true, description: true } },
-        subcategories: { select: { id: true, name: true, description: true } },
+        subcategories: {
+          select: { id: true, name: true, description: true },
+        },
       },
     });
 
