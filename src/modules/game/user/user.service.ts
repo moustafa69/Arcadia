@@ -5,6 +5,7 @@ import { PrismaService } from 'src/common/prisma/prisma.service';
 import { NotFoundError } from 'rxjs';
 import { UserIdentity } from 'src/modules/Auth/shared/identity';
 import { title } from 'process';
+import { startCase } from 'lodash';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
@@ -19,6 +20,7 @@ export class UserService {
     category,
   }: ListGameQueryDto) {
     const skip = (page - 1) * limit;
+    category = startCase(category);
 
     const where = {
       deletedAt: null,
